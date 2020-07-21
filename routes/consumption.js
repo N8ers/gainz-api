@@ -19,6 +19,9 @@ async function validateJWT (req, res, next) {
   await jwt.verify(token, accessTokenSecret, (err, user) => {
     if (err) console.log('err ', err)
     if (user) console.log('USER ', user)
+    req["body"]
+    req.body["userId"] = user.id
+    console.log('req.body: ', req.body)
   })
 
   next()
@@ -26,17 +29,7 @@ async function validateJWT (req, res, next) {
 
 router.get('/:date', validateJWT, (req, res) => {
 
-  // let authHeader = req.headers['authorization']
-  // let token = authHeader && authHeader.split(' ')[1]
-  // if (token == null) return res.sendStatus(401)
-
-  let userId;
-  jwt.verify(token, accessTokenSecret, (err, user) => {
-    if (err) console.log(err)
-    userId = user.id
-  })
-
-  console.log('user id ', userId)
+  let userId = req.body.userId
 
   let consumed = `SELECT 
   food_consumption.id, food.name, food.calories, food.protein, food_consumption.servings, food_consumption.sort_order 
@@ -49,6 +42,7 @@ router.get('/:date', validateJWT, (req, res) => {
     if (error) { 
       res.status(error.status).json({ message: error.message })
     } else {
+      console.log(dbResponse.rows)
       res.status(200).json(dbResponse.rows)
     }
   })
@@ -68,13 +62,13 @@ router.delete('/remove', validateJWT, (req, res) => {
 })
 
 router.post('/add', validateJWT, (req, res) => {
-  let { id, servings, user_id, date, sort_order  } = req.body.payload
-  console.log('add')
+  let { id, servings, date, sort_order  } = req.body.payload
+  let userId = req.body.userId
 
   const addFood = `INSERT 
   INTO food_consumption (person_id, food_id, consumed_at, servings, sort_order) 
   VALUES ($1, $2, $3, $4, $5)`
-  db.query(addFood, [user_id, id, date, servings, sort_order], (error, dbResponse) => {
+  db.query(addFood, [userId, id, date, servings, sort_order], (error, dbResponse) => {
     if (error) { 
       res.status(error.status).json({ message: error.message })
     } else {
