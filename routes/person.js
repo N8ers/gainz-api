@@ -7,10 +7,6 @@ const db = require('../database/db')
 
 const saltRounds = 10;
 
-router.get('/', (req, res) => {
-  res.json({"route": "PERSON"})
-})
-
 router.put('/login', (req, res) => {
   let { email, password } = req.body.payload;
 
@@ -46,8 +42,6 @@ router.put('/login', (req, res) => {
         name: dbUser.name 
       }, db.accessTokenSecret)
 
-      console.log(myJWT)
-
       res.status(200).json({ 
         userData: dbUser,
         jwt: myJWT
@@ -78,8 +72,6 @@ router.put('/signup', async (req, res) => {
       console.log('error ', error)
       res.status(error.status).json({ message: error.message })
     } else {
-      // console.log('dbResponse ', dbResponse)
-      // res.status(200).json({ userData: dbResponse.rows[0] })
       res.status(200)
     }
   })

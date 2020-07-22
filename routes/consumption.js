@@ -10,8 +10,6 @@ router.get('/', (req, res) => {
 })
 
 async function validateJWT (req, res, next) {
-  console.log('VALIDATE JWT FIRED')
-  console.log(req.body)
   let authHeader = req.headers['authorization']
   let token = authHeader && authHeader.split(' ')[1]
   if (token == null) return res.sendStatus(401)
@@ -21,7 +19,6 @@ async function validateJWT (req, res, next) {
     if (user) console.log('USER ', user)
     req["body"]
     req.body["userId"] = user.id
-    console.log('req.body: ', req.body)
   })
 
   next()
@@ -82,29 +79,15 @@ router.put('/consumed_at_reorder', validateJWT, async (req, res) => {
   let {foods} = req.body.payload
   const reorderFoods = `UPDATE food_consumption SET sort_order = ($1) WHERE id = ($2)`
 
-  // The HTTP ERROR HAS TO BE HERE I THINK, I don't think you can loop over a query
-
   for (let i = 0; i < foods.length; i++) {
     await db.query(reorderFoods, [foods[i].sort_order, foods[i].id], (error, dbResponse) => {
       if (error) { 
-        console.log('error')
         res.status(error.status).json({ message: error.message })
       }
-      console.log('no error')
     })
   }
 
   res.status(200).json({ message: 'success!' })
-  
-  // for (let i = 0; i < foods.length; i++) {
-  //   db.query(reorderFoods, [foods[i].sort_order, foods[i].id], (error, dbResponse) => {
-  //     console.log('okay cool')
-  //     if (error) { 
-  //       res.status(error.status).json({ message: error.message })
-  //     }
-  //   })
-  // }
-  // res.status(200).json({ message: 'success!' })
 })
 
 

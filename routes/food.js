@@ -25,10 +25,10 @@ router.get('/all', (req, res) => {
 })
 
 router.delete('/remove', validateJWT, (req, res) => {
-  let id = req.body.id
+  let foodId = req.body.id
 
   const removeFood = `DELETE FROM food WHERE id = ($1)`
-  db.query(removeFood, [id], (error, dbResponse) => {
+  db.query(removeFood, [foodId], (error, dbResponse) => {
     if (error) { 
       res.status(error.status).json({ message: error.message })
     } else {
