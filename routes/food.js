@@ -2,20 +2,7 @@ const express = require('express')
 const router = express.Router()
 
 const db = require('../database/db')
-
-function validateJWT (req, res, next) {
-  console.log('VALIDATE JWT FIRED')
-  let authHeader = req.headers['authorization']
-  let token = authHeader && authHeader.split(' ')[1]
-  if (token == null) return res.sendStatus(401)
-
-  jwt.verify(token, accessTokenSecret, (err, user) => {
-    if (err) console.log('err ', err)
-    if (user) console.log('USER ', user)
-  })
-
-  next()
-}
+const auth = require('../auth')
 
 router.get('/all', (req, res) => {
   const allFoods = `SELECT * FROM food`
@@ -24,7 +11,7 @@ router.get('/all', (req, res) => {
   })
 })
 
-router.delete('/remove', validateJWT, (req, res) => {
+router.delete('/remove', auth.validateJWT, (req, res) => {
   let foodId = req.body.id
 
   const removeFood = `DELETE FROM food WHERE id = ($1)`
@@ -37,7 +24,7 @@ router.delete('/remove', validateJWT, (req, res) => {
   })
 })
 
-router.post('/add', validateJWT, (req, res) => {
+router.post('/add', auth.validateJWT, (req, res) => {
   let { name, calories, protein } = req.body.body.food
 
   const allFoods = `INSERT INTO food (name, calories, protein) VALUES ($1, $2, $3)`

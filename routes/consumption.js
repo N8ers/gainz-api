@@ -1,30 +1,14 @@
 const express = require('express')
-const jwt = require('jsonwebtoken')
 
 const db = require('../database/db')
-const { accessTokenSecret } = require('../database/db')
+const auth = require('../auth')
 const router = express.Router()
 
 router.get('/', (req, res) => {
   res.json({"route": "CONSUMPTION"})
 })
 
-async function validateJWT (req, res, next) {
-  let authHeader = req.headers['authorization']
-  let token = authHeader && authHeader.split(' ')[1]
-  if (token == null) return res.sendStatus(401)
-
-  await jwt.verify(token, accessTokenSecret, (err, user) => {
-    if (err) console.log('err ', err)
-    if (user) console.log('USER ', user)
-    req["body"]
-    req.body["userId"] = user.id
-  })
-
-  next()
-}
-
-router.get('/:date', validateJWT, (req, res) => {
+router.get('/:date', auth.validateJWT, (req, res) => {
 
   let userId = req.body.userId
 
@@ -45,7 +29,7 @@ router.get('/:date', validateJWT, (req, res) => {
   })
 })
 
-router.delete('/remove', validateJWT, (req, res) => {
+router.delete('/remove', auth.validateJWT, (req, res) => {
   let id = req.body.consumed_id
 
   const removeFood = `DELETE FROM food_consumption WHERE id = ($1)`
@@ -58,7 +42,7 @@ router.delete('/remove', validateJWT, (req, res) => {
   })
 })
 
-router.post('/add', validateJWT, (req, res) => {
+router.post('/add', auth.validateJWT, (req, res) => {
   let { id, servings, date, sort_order  } = req.body.payload
   let userId = req.body.userId
 
@@ -74,7 +58,7 @@ router.post('/add', validateJWT, (req, res) => {
   })
 })
 
-router.put('/consumed_at_reorder', validateJWT, async (req, res) => {
+router.put('/consumed_at_reorder', auth.validateJWT, async (req, res) => {
   console.log('re order')
   let {foods} = req.body.payload
   const reorderFoods = `UPDATE food_consumption SET sort_order = ($1) WHERE id = ($2)`
