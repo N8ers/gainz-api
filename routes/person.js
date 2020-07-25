@@ -77,4 +77,20 @@ router.put('/signup', async (req, res) => {
   })
 })
 
+router.get('/checkJWT', async (req, res) => {
+  try {
+    let authHeader = req.headers['authorization']
+    let token = authHeader && authHeader.split(' ')[1]
+    if (token == null) return res.sendStatus(401)
+  
+    await jwt.verify(token, db.accessTokenSecret, (err, user) => {
+      if (err) console.log('err ', err)
+      if (user) res.json({ user })
+    })
+  }
+  catch {
+    console.log("catch! - jk it isn't something good")
+  }
+})
+
 module.exports = router;
