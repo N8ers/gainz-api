@@ -23,7 +23,6 @@ router.get('/:date', auth.validateJWT, (req, res) => {
     if (error) { 
       res.status(error.status).json({ message: error.message })
     } else {
-      console.log(dbResponse.rows)
       res.status(200).json(dbResponse.rows)
     }
   })
@@ -59,7 +58,6 @@ router.post('/add', auth.validateJWT, (req, res) => {
 })
 
 router.put('/consumed_at_reorder', auth.validateJWT, async (req, res) => {
-  console.log('re order')
   let {foods} = req.body.payload
   const reorderFoods = `UPDATE food_consumption SET sort_order = ($1) WHERE id = ($2)`
 

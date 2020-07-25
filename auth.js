@@ -9,12 +9,9 @@ async function validateJWT (req, res, next) {
 
   await jwt.verify(token, accessTokenSecret, (err, user) => {
     if (err) console.log('err ', err)
-    if (user) console.log('USER ', user)
     req["body"]
     req.body["userId"] = user.id
   })
-
-  console.log('getting called')
 
   next()
 }

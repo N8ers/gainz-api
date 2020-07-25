@@ -20,8 +20,6 @@ router.put('/login', (req, res) => {
       return
     } 
 
-    console.log('dbResp', dbResponse.rows[0])
-
     dbUser = {
       id: dbResponse.rows[0].id,
       name: dbResponse.rows[0].name,
@@ -67,7 +65,6 @@ router.put('/signup', async (req, res) => {
   let setNewUser = `INSERT INTO persons (email, name, password) VALUES ($1, $2, $3)`
   let hashedPW = await bcrypt.hash(password, saltRounds)
   db.query(setNewUser, [email, userName, hashedPW], (error, dbResponse) => {
-    console.log('second query')
     if (error) {
       console.log('error ', error)
       res.status(error.status).json({ message: error.message })
@@ -89,7 +86,7 @@ router.get('/checkJWT', async (req, res) => {
     })
   }
   catch {
-    console.log("catch! - jk it isn't something good")
+    console.log('checkJWT failed')
   }
 })
 
