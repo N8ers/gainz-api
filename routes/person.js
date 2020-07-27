@@ -38,7 +38,9 @@ router.put('/login', (req, res) => {
         email: dbUser.email,
         id: dbUser.id,
         name: dbUser.name 
-      }, db.accessTokenSecret)
+      }, db.accessTokenSecret, 
+      { expiresIn: '30s' }
+      )
 
       res.status(200).json({ 
         userData: dbUser,

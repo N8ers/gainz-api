@@ -8,12 +8,14 @@ async function validateJWT (req, res, next) {
   if (token == null) return res.sendStatus(401)
 
   await jwt.verify(token, accessTokenSecret, (err, user) => {
-    if (err) console.log('err ', err)
+    console.log('jwt verification error: ', err)
+    if (err) return res.status(403).send({ error: err })
+
+    console.log(user)
     req["body"]
     req.body["userId"] = user.id
+    next()
   })
-
-  next()
 }
 
 module.exports.validateJWT = validateJWT;
